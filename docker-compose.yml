@@ -1,0 +1,105 @@
+services:
+  mercur-db:
+    image: postgres:15
+    container_name: mercur-db
+    restart: unless-stopped
+    volumes:
+      - mercur-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  mercur-cache:
+    image: redis:7.2
+    container_name: mercur-cache
+    restart: unless-stopped
+    volumes:
+      - mercur-cache:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  mercur-backend:
+    build:
+      context: ./src/apps/backend
+      dockerfile: Dockerfile
+    container_name: mercur-backend
+    restart: unless-stopped
+    expose:
+      - "9000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mercur-db:5432/${POSTGRES_DB}
+      REDIS_URL: redis://mercur-cache:6379
+      BACKEND_URL: https://api.${PUBLIC_DOMAIN}
+      STORE_CORS: https://${PUBLIC_DOMAIN}
+      ADMIN_CORS: https://admin.${PUBLIC_DOMAIN}
+      VENDOR_CORS: https://vendor.${PUBLIC_DOMAIN}
+      AUTH_CORS: https://${PUBLIC_DOMAIN},https://admin.${PUBLIC_DOMAIN},https://vendor.${PUBLIC_DOMAIN}
+      JWT_SECRET: ${JWT_SECRET}
+      COOKIE_SECRET: ${COOKIE_SECRET}
+    depends_on:
+      mercur-db:
+        condition: service_healthy
+      mercur-cache:
+        condition: service_healthy
+
+  mercur-storefront:
+    build:
+      context: ./src/apps/storefront
+      dockerfile: Dockerfile
+    container_name: mercur-storefront
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      NEXT_PUBLIC_MEDUSA_BACKEND_URL: https://api.${PUBLIC_DOMAIN}
+      NEXT_PUBLIC_BASE_URL: https://${PUBLIC_DOMAIN}
+    depends_on:
+      - mercur-backend
+
+  mercur-vendor:
+    build:
+      context: ./src/apps/vendor-panel
+      dockerfile: Dockerfile
+    container_name: mercur-vendor
+    restart: unless-stopped
+    expose:
+      - "5173"
+    environment:
+      VITE_BACKEND_URL: https://api.${PUBLIC_DOMAIN}
+    depends_on:
+      - mercur-backend
+
+  caddy:
+    image: caddy:2
+    container_name: mercur-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    environment:
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN}
+    depends_on:
+      - mercur-backend
+      - mercur-storefront
+      - mercur-vendor
+
+volumes:
+  mercur-db:
+  mercur-cache:
+  caddy-data:
+  caddy-config:
