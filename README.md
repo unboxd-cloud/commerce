@@ -8,7 +8,7 @@ Hosted on `unboxd.cloud`.
 
 ## Overview
 
-This repository deploys the **Unboxd Commerce Platform**, a full-featured multi-service commerce system running behind a unified domain with subdomain routing.
+This repository deploys the **Unboxd Commerce Platform**, a multi-service commerce system running behind a unified domain with subdomain routing.
 
 It is a self-hosted infrastructure stack using Docker Compose for service orchestration and Caddy for TLS termination and reverse proxying.
 
@@ -43,11 +43,11 @@ One commerce platform, four subdomains (wildcard TLS certificate via Caddy):
 
 ## Deployment
 
-### 1. Clone deployment repository
+### 1. Clone repository
 
 ```bash
-git clone git@github.com:Unboxd-Cloud/mercur.git
-cd mercur
+git clone git@github.com:unboxdcloudplatform/commerce.git
+cd commerce
 ```
 
 ### 2. Fetch engine source
@@ -124,17 +124,3 @@ Caddy automatically provisions HTTPS certificates on first request for all subdo
 This platform is powered by:
 
 - https://github.com/mercurjs/mercur
-
----
-
-## Notes
-
-- Engine source is pulled manually via `git pull` inside `src/`
-- Backend service is built from `src/apps/backend`
-- Ensure upstream structure matches before deployment
-
----
-
-## References
-
-- Medusa v2 Docs: https://docs.medusajs.com
