@@ -1,4 +1,4 @@
-# mercur
+# Mercur Commerce Deployment
 
 Deployment manifest for [Mercur](https://github.com/mercurjs/mercur) (Medusa v2 multi-vendor commerce platform) at **https://commerce.unboxd.cloud**.
 
