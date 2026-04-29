@@ -1,19 +1,19 @@
 # mercur
 
-Deployment manifest for [Mercur](https://github.com/mercurjs/mercur) (Medusa v2 multi-vendor marketplace) at **https://marketplace.unboxd.cloud**.
+Deployment manifest for [Mercur](https://github.com/mercurjs/mercur) (Medusa v2 multi-vendor commerce platform) at **https://commerce.unboxd.cloud**.
 
 Hosted on `unboxd.cloud`.
 
 ## Architecture
 
-One marketplace, four subdomains (one wildcard cert covers all):
+One commerce platform, four subdomains (one wildcard cert covers all):
 
 | Subdomain | Service | Purpose |
 |---|---|---|
-| `marketplace.unboxd.cloud` | storefront (Next.js) | customer-facing |
-| `api.marketplace.unboxd.cloud` | backend (Medusa v2) | REST/GraphQL API |
-| `admin.marketplace.unboxd.cloud` | backend (Medusa admin) | platform admin UI |
-| `vendor.marketplace.unboxd.cloud` | vendor-panel (Vite) | per-vendor seller dashboard |
+| `commerce.unboxd.cloud` | storefront (Next.js) | customer-facing |
+| `api.commerce.unboxd.cloud` | backend (Medusa v2) | REST/GraphQL API |
+| `admin.commerce.unboxd.cloud` | backend (Medusa admin) | platform admin UI |
+| `vendor.commerce.unboxd.cloud` | vendor-panel (Vite) | per-vendor seller dashboard |
 
 ## Deploy
 
@@ -32,10 +32,10 @@ cp .env.example .env
 # (generate secrets: openssl rand -hex 32)
 
 # 4. point DNS — 4 records
-# A    marketplace.unboxd.cloud         -> <VM public IP>
-# A    api.marketplace.unboxd.cloud     -> <VM public IP>
-# A    admin.marketplace.unboxd.cloud   -> <VM public IP>
-# A    vendor.marketplace.unboxd.cloud  -> <VM public IP>
+# A    commerce.unboxd.cloud         -> <VM public IP>
+# A    api.commerce.unboxd.cloud     -> <VM public IP>
+# A    admin.commerce.unboxd.cloud   -> <VM public IP>
+# A    vendor.commerce.unboxd.cloud  -> <VM public IP>
 
 # 5. build + start
 docker compose up -d --build
