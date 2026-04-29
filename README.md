@@ -37,7 +37,7 @@ One commerce platform, four subdomains (wildcard TLS certificate via Caddy):
 └── src/   (external commerce engine source)
 ```
 
-> `src/` contains the external commerce engine source code and is not tracked by git.
+> `src/` contains external source code and is not tracked by git.
 
 ---
 
@@ -123,7 +123,7 @@ Caddy automatically provisions HTTPS certificates on first request for all subdo
 
 This platform is powered by:
 
-- **Mercur Commerce Engine** – https://github.com/mercurjs/mercur (Medusa v2 multi-vendor commerce system)
+- https://github.com/mercurjs/mercur
 
 ---
 
