@@ -27,26 +27,28 @@ One commerce platform, four subdomains (wildcard TLS certificate via Caddy):
 
 ---
 
-## UI (Composable Frontends)
+## UI (Composable Commerce Frontends)
 
-The platform follows a **composable frontend architecture**, where each user experience is independently deployable and communicates with the shared commerce API layer.
+The platform is designed using a **composable commerce architecture**, where each frontend is an independent application consuming the shared commerce API.
 
-### Storefront (Customer UI)
-- Built with Next.js
-- Product browsing, cart, checkout
-- Fully decoupled from backend via API layer
+This separation allows each UI to evolve, scale, and be replaced independently without affecting the core platform.
 
-### Admin Panel
-- Internal platform management UI
-- Order, product, and user administration
-- Designed for operational workflows
+### Storefront (Customer Experience)
+- Next.js-based frontend
+- Product discovery, cart, checkout, and order tracking
+- Fully API-driven (headless commerce model)
 
-### Vendor Panel
-- Seller-facing dashboard
-- Product and inventory management
-- Order fulfillment and analytics
+### Admin Panel (Operations)
+- Internal platform control center
+- Product, order, customer, and vendor management
+- Built for operational efficiency and extensibility
 
-> Each UI is independently deployable and can be replaced or extended without impacting other layers.
+### Vendor Panel (Merchant Experience)
+- Dedicated seller dashboard
+- Product lifecycle management
+- Inventory, orders, and fulfillment tracking
+
+> This composable UI layer enables a **headless + multi-tenant commerce architecture**, where frontend and backend evolve independently.
 
 ---
 
