@@ -27,6 +27,19 @@ One commerce platform, four subdomains (wildcard TLS certificate via Caddy):
 
 ---
 
+## Service Mapping (Source → Service → Domain → Port)
+
+| App Path | Docker Service | Domain | Internal Port |
+|---|---|---|---|
+| `src/apps/backend` | `mercur-backend` | `api.commerce.unboxd.cloud` | 9000 |
+| `src/apps/storefront` | `mercur-storefront` | `commerce.unboxd.cloud` | 3000 |
+| `src/apps/vendor-panel` | `mercur-vendor` | `vendor.commerce.unboxd.cloud` | 5173 |
+| (Caddy) | `mercur-caddy` | all domains | 80 / 443 |
+
+> Admin UI is served via **backend** (`/admin`) and mapped to `admin.commerce.unboxd.cloud` via Caddy.
+
+---
+
 ## UI (Composable Applications)
 
 The platform follows a **composable monorepo architecture**, where each UI is an independent app under `src/apps` and deployed as its own service.
@@ -35,21 +48,16 @@ The platform follows a **composable monorepo architecture**, where each UI is an
 - **Path:** `src/apps/storefront`
 - **Runtime:** Next.js
 - **Service:** `mercur-storefront`
-- **Role:** Customer-facing storefront (catalog, cart, checkout)
 
 ### Vendor Panel
 - **Path:** `src/apps/vendor-panel`
 - **Runtime:** Vite
 - **Service:** `mercur-vendor`
-- **Role:** Seller dashboard (products, inventory, orders)
 
 ### Admin UI
 - **Path:** `src/apps/backend`
 - **Runtime:** Medusa Admin (served via backend)
 - **Service:** `mercur-backend`
-- **Role:** Platform administration (products, orders, users, vendors)
-
-> All UI apps are built from `src/apps/*` and exposed via Docker services defined in `docker-compose.yml`.
 
 ---
 
@@ -97,12 +105,6 @@ Required variables:
 - `COOKIE_SECRET`
 - `PUBLIC_DOMAIN`
 
-Generate secure values:
-
-```bash
-openssl rand -hex 32
-```
-
 ---
 
 ### 4. DNS configuration
@@ -124,32 +126,19 @@ docker compose up -d --build
 
 ---
 
-### 6. Run database migrations
+## Naming Note (Optional Cleanup)
 
-```bash
-docker compose exec backend npx medusa db:migrate
-```
+Current service names use `mercur-*` (from upstream). For full branding consistency, you may rename them to:
 
----
+- `commerce-backend`
+- `commerce-storefront`
+- `commerce-vendor`
+- `commerce-caddy`
 
-### 7. Create admin user
-
-```bash
-docker compose exec backend npx medusa user \
-  -e admin@example.com \
-  -p <password>
-```
-
----
-
-## TLS / Networking
-
-Caddy automatically provisions HTTPS certificates on first request for all subdomains using wildcard-enabled configuration.
+This is optional but recommended for long-term clarity.
 
 ---
 
 ## Powered by
-
-This platform is powered by:
 
 - https://github.com/mercurjs/mercur
