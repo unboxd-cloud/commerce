@@ -20,35 +20,36 @@ One commerce platform, four subdomains (wildcard TLS certificate via Caddy):
 
 | Subdomain | Service | Description |
 |---|---|---|
-| `commerce.unboxd.cloud` | storefront (Next.js) | Customer-facing storefront |
-| `api.commerce.unboxd.cloud` | backend (API service) | Core commerce API |
-| `admin.commerce.unboxd.cloud` | admin panel | Platform administration UI |
-| `vendor.commerce.unboxd.cloud` | vendor panel (Vite app) | Seller/vendor dashboard |
+| `commerce.unboxd.cloud` | storefront | Customer-facing storefront |
+| `api.commerce.unboxd.cloud` | backend API | Core commerce API |
+| `admin.commerce.unboxd.cloud` | admin UI | Platform administration (served by backend) |
+| `vendor.commerce.unboxd.cloud` | vendor panel | Seller/vendor dashboard |
 
 ---
 
-## UI (Composable Commerce Frontends)
+## UI (Composable Applications)
 
-The platform is designed using a **composable commerce architecture**, where each frontend is an independent application consuming the shared commerce API.
+The platform follows a **composable monorepo architecture**, where each UI is an independent app under `src/apps` and deployed as its own service.
 
-This separation allows each UI to evolve, scale, and be replaced independently without affecting the core platform.
+### Storefront
+- **Path:** `src/apps/storefront`
+- **Runtime:** Next.js
+- **Service:** `mercur-storefront`
+- **Role:** Customer-facing storefront (catalog, cart, checkout)
 
-### Storefront (Customer Experience)
-- Next.js-based frontend
-- Product discovery, cart, checkout, and order tracking
-- Fully API-driven (headless commerce model)
+### Vendor Panel
+- **Path:** `src/apps/vendor-panel`
+- **Runtime:** Vite
+- **Service:** `mercur-vendor`
+- **Role:** Seller dashboard (products, inventory, orders)
 
-### Admin Panel (Operations)
-- Internal platform control center
-- Product, order, customer, and vendor management
-- Built for operational efficiency and extensibility
+### Admin UI
+- **Path:** `src/apps/backend`
+- **Runtime:** Medusa Admin (served via backend)
+- **Service:** `mercur-backend`
+- **Role:** Platform administration (products, orders, users, vendors)
 
-### Vendor Panel (Merchant Experience)
-- Dedicated seller dashboard
-- Product lifecycle management
-- Inventory, orders, and fulfillment tracking
-
-> This composable UI layer enables a **headless + multi-tenant commerce architecture**, where frontend and backend evolve independently.
+> All UI apps are built from `src/apps/*` and exposed via Docker services defined in `docker-compose.yml`.
 
 ---
 
@@ -59,10 +60,12 @@ This separation allows each UI to evolve, scale, and be replaced independently w
 ├── docker-compose.yml
 ├── Caddyfile
 ├── .env.example
-└── src/   (external commerce engine source)
+└── src/
+    ├── apps/
+    │   ├── backend/
+    │   ├── storefront/
+    │   └── vendor-panel/
 ```
-
-> `src/` contains external source code and is not tracked by git.
 
 ---
 
@@ -92,6 +95,7 @@ Required variables:
 - `POSTGRES_PASSWORD`
 - `JWT_SECRET`
 - `COOKIE_SECRET`
+- `PUBLIC_DOMAIN`
 
 Generate secure values:
 
