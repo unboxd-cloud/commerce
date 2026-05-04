@@ -3,29 +3,47 @@ services:
     image: postgres:15
     container_name: mercur-db
     restart: unless-stopped
+    environment:
+      POSTGRES_USER: medusa
+      POSTGRES_PASSWORD: medusa123
+      POSTGRES_DB: medusa
     volumes:
       - mercur-db:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U medusa"]
       interval: 10s
-      timeout: 3s
+      timeout: 5s
       retries: 5
 
   mercur-cache:
     image: redis:7-alpine
     container_name: mercur-cache
     restart: unless-stopped
-    volumes:
-      - mercur-cache:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
-      timeout: 3s
+      timeout: 5s
       retries: 5
+
+  mercur-backend:
+    build:
+      context: ./src/apps/api
+      dockerfile: Dockerfile
+    container_name: mercur-backend
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      DATABASE_URL: postgres://medusa:medusa123@mercur-db:5432/medusa
+      REDIS_URL: redis://mercur-cache:6379
+      NODE_ENV: development
+      ADMIN_CORS: '*'
+      STORE_CORS: '*'
+    depends_on:
+      mercur-db:
+        condition: service_healthy
+      mercur-cache:
+        condition: service_healthy
 
   mercur-storefront:
     build:
@@ -36,8 +54,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      NEXT_PUBLIC_MEDUSA_BACKEND_URL: https://api.${PUBLIC_DOMAIN}
-      NEXT_PUBLIC_BASE_URL: https://${PUBLIC_DOMAIN}
+      MEDUSA_BACKEND_URL: http://mercur-backend:9000
+      NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: pk_dev_placeholder
+    depends_on:
+      - mercur-backend
 
   caddy:
     image: caddy:2
@@ -50,11 +70,11 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
-    environment:
-      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN}
+    depends_on:
+      - mercur-storefront
+      - mercur-backend
 
 volumes:
   mercur-db:
-  mercur-cache:
   caddy-data:
   caddy-config:
