@@ -59,6 +59,19 @@ services:
     depends_on:
       - mercur-backend
 
+  mercur-vendor:
+    build:
+      context: ./src/apps/vendor-panel
+      dockerfile: Dockerfile
+    container_name: mercur-vendor
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_MEDUSA_BACKEND_URL: http://mercur-backend:9000
+    depends_on:
+      - mercur-backend
+
   caddy:
     image: caddy:2
     container_name: mercur-caddy
@@ -73,6 +86,7 @@ services:
     depends_on:
       - mercur-storefront
       - mercur-backend
+      - mercur-vendor
 
 volumes:
   mercur-db:
