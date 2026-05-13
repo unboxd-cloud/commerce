@@ -1,3 +1,11 @@
 commerce.unboxd.cloud {
     reverse_proxy mercur-storefront:8000
 }
+
+api.commerce.unboxd.cloud {
+    reverse_proxy mercur-backend:9000
+}
+
+admin.commerce.unboxd.cloud {
+    reverse_proxy mercur-backend:9000
+}
