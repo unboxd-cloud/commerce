@@ -9,3 +9,7 @@ api.commerce.unboxd.cloud {
 admin.commerce.unboxd.cloud {
     reverse_proxy mercur-backend:9000
 }
+
+vendor.commerce.unboxd.cloud {
+    reverse_proxy mercur-vendor:5173
+}
